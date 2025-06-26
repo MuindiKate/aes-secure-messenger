@@ -1,8 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox
 import base64
-import random
-import string
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad
 import africastalking
@@ -15,32 +13,31 @@ receiver_number = "+254790049202"  # Sandbox test number
 africastalking.initialize(username, api_key)
 sms = africastalking.SMS
 
-# === AES Helper Functions ===
-def generate_key(length=16):
-    return ''.join(random.choices(string.ascii_letters + string.digits, k=length))
+# === AES Setup ===
+shared_key = "mysupersecretkey"  # 16 characters
 
-def encrypt_message(message, key):
-    key_bytes = key.encode('utf-8')[:16]
+def encrypt_message(message):
+    key_bytes = shared_key.encode('utf-8')
     cipher = AES.new(key_bytes, AES.MODE_CBC)
     ct_bytes = cipher.encrypt(pad(message.encode(), AES.block_size))
     iv = base64.b64encode(cipher.iv).decode()
     ct = base64.b64encode(ct_bytes).decode()
     return f"{iv}:{ct}"
 
-def send_otp_via_sms(otp):
-    message = f"Your OTP key for decryption is: {otp}"
+def send_sms(encrypted_message):
+    message = f"Encrypted Message:\n{encrypted_message}"
     try:
         sms.send(message, [receiver_number])
-        return "[+] OTP sent via SMS."
+        return "[+] Encrypted message sent via SMS."
     except Exception as e:
-        return f"[!] Error sending OTP: {e}"
+        return f"[!] SMS failed: {e}"
 
-# === GUI Setup ===
+# === GUI ===
 window = tk.Tk()
-window.title("Sender - AES Secure Messenger")
+window.title("Sender - AES Messenger")
 window.geometry("600x400")
 
-tk.Label(window, text="Enter Message to Encrypt:").pack()
+tk.Label(window, text="Enter Message:").pack()
 entry_message = tk.Text(window, height=4, width=60)
 entry_message.pack()
 
@@ -53,15 +50,13 @@ def handle_encrypt():
     if not msg:
         messagebox.showwarning("Empty", "Please enter a message.")
         return
-    key = generate_key()
-    encrypted = encrypt_message(msg, key)
+    encrypted = encrypt_message(msg)
     entry_encrypted.delete("1.0", tk.END)
     entry_encrypted.insert(tk.END, encrypted)
-    status = send_otp_via_sms(key)
-    messagebox.showinfo("Done", f"Encrypted and OTP sent.\n\n{status}")
+    sms_status = send_sms(encrypted)
+    messagebox.showinfo("Success", f"Message encrypted and sent.\n\n{sms_status}")
 
-tk.Button(window, text="Encrypt & Send OTP", command=handle_encrypt).pack(pady=10)
-
-tk.Label(window, text="Copy the encrypted message and send it to the receiver.").pack(pady=(5, 0))
+tk.Button(window, text="Encrypt & Send", command=handle_encrypt).pack(pady=10)
+tk.Label(window, text="Encrypted message will also be sent via SMS.").pack()
 
 window.mainloop()
