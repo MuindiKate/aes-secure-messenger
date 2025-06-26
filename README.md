@@ -38,7 +38,7 @@ Setup Instructions
 1. **Clone the repo**
 
 ```bash
-git clone https://github.com/yourusername/aes-secure-messenger.git
+git clone https://github.com/MuindiKate/aes-secure-messenger.git
 cd aes-secure-messenger
 ```
 
