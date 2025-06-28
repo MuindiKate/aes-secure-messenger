@@ -17,12 +17,12 @@ A Python-based secure messaging application using **AES symmetric encryption** a
  Sender
 1. Enters a message
 2. App encrypts it with a randomly generated AES key
-3. The encrypted message is sent via SMS using **Africa’s Talking**
-4. Encrypted message is displayed and can be copied/shared
+3. The private key is sent via OTP SMS using **Africa’s Talking**
+4. Encrypted message is displayed and can be copied/shared via email/ whatsapp
 
  Receiver
-1. Receives the encrypted message via SMS.
-2. Inputs the encrypted message 
+1. Receives the private key via SMS.
+2. Copy pastes and Inputs the encrypted message sent earlier and the private key sent via SMS
 3. App decrypts and displays the original message
 
  Technologies Used
@@ -63,7 +63,7 @@ python receiver_gui.py
 ##  Notes
 
 * This project uses **Africa’s Talking sandbox** to simulate OTP delivery.
-* OTP SMS will appear in the **Africa’s Talking SMS logs**, not on a real phone unless you go live.
+* OTP SMS will appear on a real phone as it is a Live app.
 * Manual transfer of encrypted messages simulates remote communication.
 
 
