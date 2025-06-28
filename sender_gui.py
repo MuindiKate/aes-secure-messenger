@@ -1,34 +1,37 @@
 import tkinter as tk
 from tkinter import messagebox
 import base64
+import random
+import string
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad
 import africastalking
 
 # === Africa's Talking Setup ===
-username = "CyptoAce" #My App username
+username = "CyptoAce" 
 api_key = "atsk_14c65191971413f08cbc603c4b7571386581cf0f2a42b0df88df914406211b9638f23b4a"
 receiver_number = "+254788364422"  # Airtel number
 
 africastalking.initialize(username, api_key)
 sms = africastalking.SMS
 
-# === AES Setup ===
-shared_key = "mysupersecretkey"  # 16 characters
+# === Key + Encryption ===
+def generate_key(length=16):
+    return ''.join(random.choices(string.ascii_letters + string.digits, k=length))
 
-def encrypt_message(message):
-    key_bytes = shared_key.encode('utf-8')
+def encrypt_message(message, key):
+    key_bytes = key.encode('utf-8')[:16]
     cipher = AES.new(key_bytes, AES.MODE_CBC)
     ct_bytes = cipher.encrypt(pad(message.encode(), AES.block_size))
     iv = base64.b64encode(cipher.iv).decode()
     ct = base64.b64encode(ct_bytes).decode()
     return f"{iv}:{ct}"
 
-def send_sms(encrypted_message):
-    message = f"Encrypted Message:\n{encrypted_message}"
+def send_sms(key):
+    message = f"Your OTP key for decryption is: {key}"
     try:
         sms.send(message, [receiver_number])
-        return "[+] Encrypted message sent via SMS."
+        return "[+] OTP key sent via SMS."
     except Exception as e:
         return f"[!] SMS failed: {e}"
 
@@ -50,13 +53,14 @@ def handle_encrypt():
     if not msg:
         messagebox.showwarning("Empty", "Please enter a message.")
         return
-    encrypted = encrypt_message(msg)
+    key = generate_key()
+    encrypted = encrypt_message(msg, key)
     entry_encrypted.delete("1.0", tk.END)
     entry_encrypted.insert(tk.END, encrypted)
-    sms_status = send_sms(encrypted)
-    messagebox.showinfo("Success", f"Message encrypted and sent.\n\n{sms_status}")
+    sms_status = send_sms(key)
+    messagebox.showinfo("Success", f"Message encrypted.\n\n{sms_status}\n\nNow send the encrypted message to the receiver manually.")
 
-tk.Button(window, text="Encrypt & Send", command=handle_encrypt).pack(pady=10)
-tk.Label(window, text="Encrypted message will also be sent via SMS.").pack()
+tk.Button(window, text="Encrypt & Send OTP", command=handle_encrypt).pack(pady=10)
+tk.Label(window, text="Send the encrypted message separately (WhatsApp, email, etc).").pack()
 
 window.mainloop()
