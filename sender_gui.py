@@ -6,9 +6,9 @@ from Crypto.Util.Padding import pad
 import africastalking
 
 # === Africa's Talking Setup ===
-username = "sandbox"
-api_key = "atsk_649b7b7efeba8ee23ca43d0a96bdf05e2da088b21e52feb8d8fdc1887d66d00bd1cb89ad"
-receiver_number = "+254790049202"  # Sandbox test number
+username = "CyptoAce" #My App username
+api_key = "atsk_14c65191971413f08cbc603c4b7571386581cf0f2a42b0df88df914406211b9638f23b4a"
+receiver_number = "+254788364422"  # Airtel number
 
 africastalking.initialize(username, api_key)
 sms = africastalking.SMS
